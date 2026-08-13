@@ -1,0 +1,6 @@
+com/devops/weatherapp/model/WeatherLog.class
+com/devops/weatherapp/controller/WeatherController.class
+com/devops/weatherapp/service/WeatherService.class
+com/devops/weatherapp/repository/WeatherLogRepository.class
+com/devops/weatherapp/WeatherAppApplication.class
+com/devops/weatherapp/config/RestTemplateConfig.class

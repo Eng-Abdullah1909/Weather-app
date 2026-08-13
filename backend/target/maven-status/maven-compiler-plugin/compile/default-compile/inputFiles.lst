@@ -1,0 +1,6 @@
+/home/ubuntu/weather-app/backend/src/main/java/com/devops/weatherapp/model/WeatherLog.java
+/home/ubuntu/weather-app/backend/src/main/java/com/devops/weatherapp/controller/WeatherController.java
+/home/ubuntu/weather-app/backend/src/main/java/com/devops/weatherapp/WeatherAppApplication.java
+/home/ubuntu/weather-app/backend/src/main/java/com/devops/weatherapp/service/WeatherService.java
+/home/ubuntu/weather-app/backend/src/main/java/com/devops/weatherapp/repository/WeatherLogRepository.java
+/home/ubuntu/weather-app/backend/src/main/java/com/devops/weatherapp/config/RestTemplateConfig.java

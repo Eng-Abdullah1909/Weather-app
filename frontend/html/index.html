@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Weather DevOps App</title>
+</head>
+<body>
+  <h1>Weather Forecast</h1>
+  <input id="place" value="London,GB">
+  <button onclick="getWeather()">Get Forecast</button>
+  <button onclick="getHistory()">Show History</button>
+  <pre id="output"></pre>
+
+  <script>
+    async function getWeather() {
+      const place = document.getElementById('place').value;
+      const res = await fetch(`/api/weather?place=${encodeURIComponent(place)}`);
+      const data = await res.text();
+      document.getElementById('output').textContent = data;
+    }
+
+    async function getHistory() {
+      const res = await fetch('/api/history');
+      const data = await res.json();
+      document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
