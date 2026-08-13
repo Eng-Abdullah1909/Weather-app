@@ -1,6 +1,16 @@
 pipeline {
     agent any
 
+
+    environment {
+        DOCKERHUB_CREDS = credentials('dockerhub-creds')
+        DOCKERHUB_USER  = "${DOCKERHUB_CREDS_USR}"
+        IMAGE_TAG       = "${env.BUILD_NUMBER}"
+        BACKEND_IMAGE   = "${DOCKERHUB_USER}/weather-backend"
+        FRONTEND_IMAGE  = "${DOCKERHUB_USER}/weather-frontend"
+        KUBE_NAMESPACE  = "weather-app"
+    }    
+
     stages {
 
         stage('checkout') {
@@ -9,8 +19,8 @@ pipeline {
             }
 
         }
-        
-        stage('Build Backend JAR') {
+
+        stage('Build Backend JAR') {Credentials Binding
             steps {
                 dir('backend') {
                     sh 'mvn clean package -DskipTests'
