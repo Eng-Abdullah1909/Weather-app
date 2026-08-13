@@ -8,7 +8,6 @@ pipeline {
         IMAGE_TAG       = "${env.BUILD_NUMBER}"
         BACKEND_IMAGE   = "${DOCKERHUB_USER}/weather-backend"
         FRONTEND_IMAGE  = "${DOCKERHUB_USER}/weather-frontend"
-        KUBE_NAMESPACE  = "weather-app"
     }    
 
     stages {
@@ -20,7 +19,7 @@ pipeline {
 
         }
 
-        stage('Build Backend JAR') {Credentials Binding
+        stage('Build Backend JAR') {
             steps {
                 dir('backend') {
                     sh 'mvn clean package -DskipTests'
