@@ -19,20 +19,49 @@ pipeline {
 
         }
 
-        stage('Build Backend JAR') {
+        stage('Code Linting') {
             steps {
                 dir('backend') {
-                    sh 'mvn clean package -DskipTests'
+                    sh 'mvn checkstyle:check'  // Java style check
                 }
             }
-        }
+        }        
 
-        stage('Build Docker Images') {
+        stage('Unit Tests') {
             steps {
-                sh "docker build -t ${BACKEND_IMAGE}:${IMAGE_TAG} -t ${BACKEND_IMAGE}:latest ./backend"
-                sh "docker build -t ${FRONTEND_IMAGE}:${IMAGE_TAG} -t ${FRONTEND_IMAGE}:latest ./frontend"
+                dir('backend') {
+                    sh 'mvn test'
+                }
             }
-        }    
+            post {
+                always {
+                    junit 'backend/target/surefire-reports/*.xml' 
+                }
+            }
+        }        
+
+        // stage('Code Linting') {
+        //     steps {
+        //         dir('backend') {
+        //             sh 'mvn checkstyle:check' 
+        //         }
+        //     }
+        // }        
+
+        // stage('Build Backend JAR') {
+        //     steps {
+        //         dir('backend') {
+        //             sh 'mvn clean package -DskipTests'
+        //         }
+        //     }
+        // }
+
+        // stage('Build Docker Images') {
+        //     steps {
+        //         sh "docker build -t ${BACKEND_IMAGE}:${IMAGE_TAG} -t ${BACKEND_IMAGE}:latest ./backend"
+        //         sh "docker build -t ${FRONTEND_IMAGE}:${IMAGE_TAG} -t ${FRONTEND_IMAGE}:latest ./frontend"
+        //     }
+        // }    
         
     }
 }
