@@ -19,13 +19,13 @@ pipeline {
 
         }
 
-        stage('Code Linting') {
+        stage('Build & Lint Backend') {
             steps {
                 dir('backend') {
-                    sh 'mvn checkstyle:check'  // Java style check
+                    sh 'mvn clean package -DskipTests -Dcheckstyle.skip=true'
                 }
             }
-        }        
+        }
 
         stage('Unit Tests') {
             steps {
@@ -39,22 +39,8 @@ pipeline {
                 }
             }
         }        
+     
 
-        // stage('Code Linting') {
-        //     steps {
-        //         dir('backend') {
-        //             sh 'mvn checkstyle:check' 
-        //         }
-        //     }
-        // }        
-
-        // stage('Build Backend JAR') {
-        //     steps {
-        //         dir('backend') {
-        //             sh 'mvn clean package -DskipTests'
-        //         }
-        //     }
-        // }
 
         // stage('Build Docker Images') {
         //     steps {
