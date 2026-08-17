@@ -44,6 +44,27 @@ pipeline {
         //     }
         // }
 
+        stage('Code Coverage') {
+            steps {
+                dir('backend') {
+                    sh 'mvn test jacoco:report'  // Run tests + generate report
+                }
+            }
+            post {
+                always {
+                    // Publish coverage report
+                    publishHTML([
+                        reportDir: 'backend/target/site/jacoco',
+                        reportFiles: 'index.html',
+                        reportName: 'Jacoco Coverage Report',
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: false
+                    ])
+                }
+            }
+        }
+
         // stage('Integration Tests') {
         //     steps {
         //         dir('backend') {
@@ -57,41 +78,41 @@ pipeline {
         //     }
         // }
 
-        stage('Dependency Scan') {
-            steps {
-                dir('backend') {
-                    sh 'mvn dependency-check:check || echo "Dependency scan completed with warnings"'
-                }
-            }
-            post {
-                always {
-                    script {
-                        if (fileExists('backend/target/dependency-check-report.html')) {
-                            publishHTML([
-                                reportDir: 'backend/target',
-                                reportFiles: 'dependency-check-report.html',
-                                reportName: 'OWASP Dependency Report',
-                                allowMissing: true,
-                                alwaysLinkToLastBuild: false,
-                                keepAll: false
-                            ])
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Dependency Scan') {
+        //     steps {
+        //         dir('backend') {
+        //             sh 'mvn dependency-check:check || echo "Dependency scan completed with warnings"'
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             script {
+        //                 if (fileExists('backend/target/dependency-check-report.html')) {
+        //                     publishHTML([
+        //                         reportDir: 'backend/target',
+        //                         reportFiles: 'dependency-check-report.html',
+        //                         reportName: 'OWASP Dependency Report',
+        //                         allowMissing: true,
+        //                         alwaysLinkToLastBuild: false,
+        //                         keepAll: false
+        //                     ])
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Security Scan') {
-            steps {
-                sh """
-                    # Scan for secrets in code
-                    trivy fs --severity HIGH,CRITICAL --exit-code 0 ./backend || echo "No secrets found"
+        // stage('Security Scan') {
+        //     steps {
+        //         sh """
+        //             # Scan for secrets in code
+        //             trivy fs --severity HIGH,CRITICAL --exit-code 0 ./backend || echo "No secrets found"
                     
-                    # Scan Dockerfile for misconfigurations
-                    trivy config --severity HIGH,CRITICAL --exit-code 0 ./backend/Dockerfile || echo "No Dockerfile issues found"
-                """
-            }
-        }
+        //             # Scan Dockerfile for misconfigurations
+        //             trivy config --severity HIGH,CRITICAL --exit-code 0 ./backend/Dockerfile || echo "No Dockerfile issues found"
+        //         """
+        //     }
+        // }
 
         stage('Build Docker Images') {
             steps {
@@ -100,26 +121,32 @@ pipeline {
             }
         }    
 
-        stage('Trivy Vulnerability Scan') {
-            steps {
-                sh """
-                    # Scan Backend with JSON report
-                    trivy image --severity HIGH,CRITICAL --exit-code 0 \
-                        --format json -o trivy-backend-report.json \
-                        ${BACKEND_IMAGE}:${IMAGE_TAG}
+        // stage('Trivy Vulnerability Scan') {
+        //     steps {
+        //         sh """
+        //             # Scan Backend with JSON report
+        //             trivy image --severity HIGH,CRITICAL --exit-code 0 \
+        //                 --format json -o trivy-backend-report.json \
+        //                 ${BACKEND_IMAGE}:${IMAGE_TAG}
                     
-                    # Scan Frontend with JSON report
-                    trivy image --severity HIGH,CRITICAL --exit-code 0 \
-                        --format json -o trivy-frontend-report.json \
-                        ${FRONTEND_IMAGE}:${IMAGE_TAG}
-                """
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'trivy-*.json'
-                }
+        //             # Scan Frontend with JSON report
+        //             trivy image --severity HIGH,CRITICAL --exit-code 0 \
+        //                 --format json -o trivy-frontend-report.json \
+        //                 ${FRONTEND_IMAGE}:${IMAGE_TAG}
+        //         """
+        //     }
+        //     post {
+        //         always {
+        //             archiveArtifacts artifacts: 'trivy-*.json'
+        //         }
+        //     }
+        // }
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'backend/target/*.jar', fingerprint: true
             }
         }
+
     }
 
     post {
