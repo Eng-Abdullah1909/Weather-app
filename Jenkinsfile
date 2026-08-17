@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    options {
+        timeout(time: 1, unit: 'HOURS')
+        disableConcurrentBuilds abortPrevious: true
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
     environment {
         DOCKERHUB_CREDS = credentials('dockerhub-creds')
         DOCKERHUB_USER  = "${DOCKERHUB_CREDS_USR}"
