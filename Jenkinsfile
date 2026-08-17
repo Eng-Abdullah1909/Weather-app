@@ -1,7 +1,6 @@
 pipeline {
     agent any
 
-
     environment {
         DOCKERHUB_CREDS = credentials('dockerhub-creds')
         DOCKERHUB_USER  = "${DOCKERHUB_CREDS_USR}"
@@ -16,7 +15,6 @@ pipeline {
             steps{
                 checkout scm
             }
-
         }
 
         stage('Build & Lint Backend') {
@@ -27,34 +25,6 @@ pipeline {
             }
         }
 
-        // stage('Unit Tests') {
-        //     steps {
-        //         dir('backend') {
-        //             sh 'mvn test'
-        //         }
-        //     }
-        //     post {
-        //         always {
-        //             junit 'backend/target/surefire-reports/*.xml' 
-        //         }
-        //     }
-        // }        
-     
-        // stage('Integration Tests') {
-        //     steps {
-        //         dir('backend') {
-        //             sh 'mvn verify'  // Runs *IT.java
-        //         }
-        //     }
-        //     post {
-        //         always {
-        //             junit 'backend/target/failsafe-reports/*.xml'
-        //         }
-        //     }
-        // }
- 
-
-
         stage('Build Docker Images') {
             steps {
                 sh "docker build -t ${BACKEND_IMAGE}:${IMAGE_TAG} -t ${BACKEND_IMAGE}:latest ./backend"
@@ -62,46 +32,26 @@ pipeline {
             }
         }    
 
-
         stage('Trivy Vulnerability Scan') {
             steps {
                 sh """
-                    # Scan Backend with HTML report
+                    # Scan Backend with JSON report
                     trivy image --severity HIGH,CRITICAL --exit-code 0 \
-                        --format html -o trivy-backend-report.html \
+                        --format json -o trivy-backend-report.json \
                         ${BACKEND_IMAGE}:${IMAGE_TAG}
                     
-                    # Scan Frontend with HTML report
+                    # Scan Frontend with JSON report
                     trivy image --severity HIGH,CRITICAL --exit-code 0 \
-                        --format html -o trivy-frontend-report.html \
+                        --format json -o trivy-frontend-report.json \
                         ${FRONTEND_IMAGE}:${IMAGE_TAG}
                 """
             }
             post {
                 always {
-                    // Archive reports
-                    archiveArtifacts artifacts: 'trivy-*.html'
-                    
-                    // Publish HTML report (requires HTML Publisher plugin)
-                    publishHTML([
-                        reportDir: '.',
-                        reportFiles: 'trivy-backend-report.html',
-                        reportName: 'Trivy Backend Scan',
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: false                        
-                    ])
-                    publishHTML([
-                        reportDir: '.',
-                        reportFiles: 'trivy-frontend-report.html',
-                        reportName: 'Trivy Frontend Scan',
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: false                        
-                    ])
+                    // Archive JSON reports
+                    archiveArtifacts artifacts: 'trivy-*.json'
                 }
             }
         }
-        
     }
 }
