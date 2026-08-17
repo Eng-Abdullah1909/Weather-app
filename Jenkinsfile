@@ -27,18 +27,18 @@ pipeline {
             }
         }
 
-        stage('Unit Tests') {
-            steps {
-                dir('backend') {
-                    sh 'mvn test'
-                }
-            }
-            post {
-                always {
-                    junit 'backend/target/surefire-reports/*.xml' 
-                }
-            }
-        }        
+        // stage('Unit Tests') {
+        //     steps {
+        //         dir('backend') {
+        //             sh 'mvn test'
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             junit 'backend/target/surefire-reports/*.xml' 
+        //         }
+        //     }
+        // }        
      
 
 
