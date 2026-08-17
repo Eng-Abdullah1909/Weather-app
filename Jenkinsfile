@@ -79,29 +79,9 @@ pipeline {
             }
             post {
                 always {
-                    // Archive reports
-                    archiveArtifacts artifacts: 'trivy-*.html'
-                    
-                    // Publish HTML report (requires HTML Publisher plugin)
-                    publishHTML([
-                        reportDir: '.',
-                        reportFiles: 'trivy-backend-report.html',
-                        reportName: 'Trivy Backend Scan'
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: false                        
-                    ])
-                    publishHTML([
-                        reportDir: '.',
-                        reportFiles: 'trivy-frontend-report.html',
-                        reportName: 'Trivy Frontend Scan'
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: false                        
-                    ])
+                    archiveArtifacts artifacts: 'trivy-reports/*.html'
                 }
             }
-        }
         
     }
 }
